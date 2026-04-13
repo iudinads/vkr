@@ -99,8 +99,16 @@ DATABASE_URL=postgresql://postgres:postgres@postgres:5432/vkr_db
 SECRET_KEY=${SECRET_KEY}
 # VPS_ЗАМЕНИТЕ_МЕНЯ: для продакшена обычно False
 DEBUG=False
-# VPS_ЗАМЕНИТЕ_МЕНЯ: ключ внешнего API, если используется
-API_KEY=replace-me
+# VPS_ЗАМЕНИТЕ_МЕНЯ: ключ DeepSeek API (https://platform.deepseek.com/)
+DEEPSEEK_API_KEY=replace-with-your-deepseek-key
+DEEPSEEK_API_URL=https://api.deepseek.com/v1/chat/completions
+# VPS_ЗАМЕНИТЕ_МЕНЯ: SMTP настройки для отправки писем
+MAIL_SERVER=smtp.yandex.ru
+MAIL_PORT=465
+MAIL_USE_SSL=True
+MAIL_USERNAME=your-email@yandex.ru
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@yandex.ru
 # VPS_ЗАМЕНИТЕ_МЕНЯ: укажите реальные переменные окружения для продакшена
 EOF
 else
@@ -117,6 +125,30 @@ else
   fi
   if ! grep -q '^DATABASE_URL=' .env; then
     echo 'DATABASE_URL=postgresql://postgres:postgres@postgres:5432/vkr_db' >> .env
+  fi
+  if ! grep -q '^DEEPSEEK_API_KEY=' .env; then
+    echo 'DEEPSEEK_API_KEY=replace-with-your-deepseek-key' >> .env
+  fi
+  if ! grep -q '^DEEPSEEK_API_URL=' .env; then
+    echo 'DEEPSEEK_API_URL=https://api.deepseek.com/v1/chat/completions' >> .env
+  fi
+  if ! grep -q '^MAIL_SERVER=' .env; then
+    echo 'MAIL_SERVER=smtp.yandex.ru' >> .env
+  fi
+  if ! grep -q '^MAIL_PORT=' .env; then
+    echo 'MAIL_PORT=465' >> .env
+  fi
+  if ! grep -q '^MAIL_USE_SSL=' .env; then
+    echo 'MAIL_USE_SSL=True' >> .env
+  fi
+  if ! grep -q '^MAIL_USERNAME=' .env; then
+    echo 'MAIL_USERNAME=your-email@yandex.ru' >> .env
+  fi
+  if ! grep -q '^MAIL_PASSWORD=' .env; then
+    echo 'MAIL_PASSWORD=your-app-password' >> .env
+  fi
+  if ! grep -q '^MAIL_DEFAULT_SENDER=' .env; then
+    echo 'MAIL_DEFAULT_SENDER=your-email@yandex.ru' >> .env
   fi
 fi
 

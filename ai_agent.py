@@ -12,7 +12,7 @@ from statistic_utils import perform_statistical_analysis
 
 # DeepSeek API configuration
 DEEPSEEK_API_URL = os.getenv('DEEPSEEK_API_URL', 'https://api.deepseek.com/v1/chat/completions').strip()
-DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-a76883ed56594a129842c0c81e96790b').strip()
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '').strip()
 
 
 def detect_task_type(df: pd.DataFrame, target_column: str) -> str:
