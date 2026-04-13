@@ -105,6 +105,19 @@ API_KEY=replace-me
 EOF
 else
   echo ".env уже существует, не перезаписываю"
+  # Добавляем недостающие переменные PostgreSQL в существующий .env (идемпотентно)
+  if ! grep -q '^POSTGRES_USER=' .env; then
+    echo 'POSTGRES_USER=postgres' >> .env
+  fi
+  if ! grep -q '^POSTGRES_PASSWORD=' .env; then
+    echo 'POSTGRES_PASSWORD=postgres' >> .env
+  fi
+  if ! grep -q '^POSTGRES_DB=' .env; then
+    echo 'POSTGRES_DB=vkr_db' >> .env
+  fi
+  if ! grep -q '^DATABASE_URL=' .env; then
+    echo 'DATABASE_URL=postgresql://postgres:postgres@postgres:5432/vkr_db' >> .env
+  fi
 fi
 
 echo "[5/9] Обновление nginx-конфига домена..."
