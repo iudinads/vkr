@@ -18,7 +18,7 @@ if [[ "$VPS_IP" == *"xxx"* ]]; then
   exit 1
 fi
 
-if [[ "$CERTBOT_EMAIL" == "diyudina033@gmail.com" ]]; then
+if [[ "$CERTBOT_EMAIL" == "admin@example.com" ]]; then
   echo "Ошибка: заполните CERTBOT_EMAIL в deploy.sh"
   exit 1
 fi
@@ -69,9 +69,13 @@ echo "[4/9] Подготовка .env..."
 if [ ! -f .env ]; then
   SECRET_KEY="$(openssl rand -hex 32)"
   cat > .env <<EOF
+# VPS_ЗАМЕНИТЕ_МЕНЯ: строка подключения к вашей БД на VPS
 DATABASE_URL=postgresql://localhost:5432/db
+# Секретный ключ генерируется автоматически при первом деплое
 SECRET_KEY=${SECRET_KEY}
+# VPS_ЗАМЕНИТЕ_МЕНЯ: для продакшена обычно False
 DEBUG=False
+# VPS_ЗАМЕНИТЕ_МЕНЯ: ключ внешнего API, если используется
 API_KEY=replace-me
 # VPS_ЗАМЕНИТЕ_МЕНЯ: укажите реальные переменные окружения для продакшена
 EOF
