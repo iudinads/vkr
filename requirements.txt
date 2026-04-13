@@ -1,6 +1,7 @@
 flask
 flask-login
 flask-sqlalchemy
+flask-migrate
 psycopg2-binary
 flask-mail
 python-dotenv
@@ -13,3 +14,5 @@ scikit-learn
 statsmodels
 requests
 markdown
+reportlab
+gunicorn

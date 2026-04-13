@@ -58,19 +58,29 @@ systemctl enable --now docker
 
 echo "[3/9] Клонирование/обновление репозитория..."
 mkdir -p "${REMOTE_APP_DIR}"
+AUTH_HTTPS_REPO="${GIT_REPO_HTTPS}"
+
 if [ ! -d "${REMOTE_APP_DIR}/.git" ]; then
   if git clone "${GIT_REPO}" "${REMOTE_APP_DIR}"; then
     echo "Клонирование по SSH успешно"
   else
     echo "SSH-клонирование не удалось, пробую HTTPS..."
-    git clone "${GIT_REPO_HTTPS}" "${REMOTE_APP_DIR}"
+    if git clone "${AUTH_HTTPS_REPO}" "${REMOTE_APP_DIR}"; then
+      git -C "${REMOTE_APP_DIR}" remote set-url origin "${GIT_REPO_HTTPS}" || true
+    else
+      echo "Ошибка: не удалось клонировать репозиторий по HTTPS."
+      echo "Проверьте доступность репозитория и URL: ${GIT_REPO_HTTPS}"
+      exit 1
+    fi
   fi
 else
-  if ! git -C "${REMOTE_APP_DIR}" remote get-url origin | grep -q "${GIT_REPO_HTTPS}"; then
-    git -C "${REMOTE_APP_DIR}" remote set-url origin "${GIT_REPO_HTTPS}" || true
-  fi
-  git -C "${REMOTE_APP_DIR}" fetch --all
+  git -C "${REMOTE_APP_DIR}" remote set-url origin "${AUTH_HTTPS_REPO}" || true
+  git -C "${REMOTE_APP_DIR}" fetch --all || {
+    echo "Ошибка: fetch не удался. Проверьте доступность репозитория."
+    exit 1
+  }
   git -C "${REMOTE_APP_DIR}" reset --hard origin/main
+  git -C "${REMOTE_APP_DIR}" remote set-url origin "${GIT_REPO_HTTPS}" || true
 fi
 
 cd "${REMOTE_APP_DIR}"
