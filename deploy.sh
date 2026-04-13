@@ -12,6 +12,8 @@ CERTBOT_EMAIL="diyudina033@gmail.com"
 # VPS_ЗАМЕНИТЕ_МЕНЯ: путь проекта на VPS
 REMOTE_APP_DIR="/opt/vkr"
 GIT_REPO="git@github.com:iudinads/vkr.git"
+# VPS_ЗАМЕНИТЕ_МЕНЯ: HTTPS URL репозитория (используется как fallback, если SSH-ключи не настроены на VPS)
+GIT_REPO_HTTPS="https://github.com/iudinads/vkr.git"
 
 if [[ "$VPS_IP" == *"xxx"* ]]; then
   echo "Ошибка: заполните VPS_IP в deploy.sh"
@@ -26,7 +28,7 @@ fi
 echo "Подключение к ${SSH_USER}@${VPS_IP} и запуск деплоя..."
 
 ssh "${SSH_USER}@${VPS_IP}" \
-  "DOMAIN='${DOMAIN}' CERTBOT_EMAIL='${CERTBOT_EMAIL}' REMOTE_APP_DIR='${REMOTE_APP_DIR}' GIT_REPO='${GIT_REPO}' bash -s" <<'REMOTE_SCRIPT'
+  "DOMAIN='${DOMAIN}' CERTBOT_EMAIL='${CERTBOT_EMAIL}' REMOTE_APP_DIR='${REMOTE_APP_DIR}' GIT_REPO='${GIT_REPO}' GIT_REPO_HTTPS='${GIT_REPO_HTTPS}' bash -s" <<'REMOTE_SCRIPT'
 set -euo pipefail
 
 echo "[1/9] Обновление системы..."
@@ -57,8 +59,16 @@ systemctl enable --now docker
 echo "[3/9] Клонирование/обновление репозитория..."
 mkdir -p "${REMOTE_APP_DIR}"
 if [ ! -d "${REMOTE_APP_DIR}/.git" ]; then
-  git clone "${GIT_REPO}" "${REMOTE_APP_DIR}"
+  if git clone "${GIT_REPO}" "${REMOTE_APP_DIR}"; then
+    echo "Клонирование по SSH успешно"
+  else
+    echo "SSH-клонирование не удалось, пробую HTTPS..."
+    git clone "${GIT_REPO_HTTPS}" "${REMOTE_APP_DIR}"
+  fi
 else
+  if ! git -C "${REMOTE_APP_DIR}" remote get-url origin | grep -q "${GIT_REPO_HTTPS}"; then
+    git -C "${REMOTE_APP_DIR}" remote set-url origin "${GIT_REPO_HTTPS}" || true
+  fi
   git -C "${REMOTE_APP_DIR}" fetch --all
   git -C "${REMOTE_APP_DIR}" reset --hard origin/main
 fi
