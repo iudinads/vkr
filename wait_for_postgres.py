@@ -6,9 +6,10 @@ import psycopg2
 
 
 def main() -> None:
-    database_url = os.getenv("DATABASE_URL", "")
-    if not database_url:
-        raise RuntimeError("DATABASE_URL is not set")
+    database_url = os.getenv(
+        "DATABASE_URL",
+        "postgresql://postgres:postgres@postgres:5432/vkr_db",
+    )
 
     parsed = urlparse(database_url)
     host = parsed.hostname or "postgres"

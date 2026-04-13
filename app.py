@@ -46,7 +46,10 @@ load_dotenv()
 
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost/dbname')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'DATABASE_URL',
+    'postgresql://postgres:postgres@postgres:5432/vkr_db'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.yandex.ru')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 465))
