@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистический анализ данных</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_1.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_static.css') }}?v=1.0">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+        crossorigin="anonymous"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+        integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+        crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Меню</a>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Валидация данных</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('statistical_analysis') }}">
+                            <i class="fas fa-chart-line me-1"></i>Статистический анализ
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">{{ current_user.email }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Выйти</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="loginBtnNav">Войти</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Форма выбора целевой переменной -->
+                <div class="analysis-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line me-2"></i>Статистический анализ данных
+                    </h2>
+                    
+                    <form method="POST" class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label for="target_column" class="form-label fw-medium text-secondary">
+                                <i class="fas fa-bullseye me-1"></i>Целевая переменная (опционально)
+                            </label>
+                            <div class="custom-select-wrapper">
+                                <select class="form-select custom-select" id="target_column" name="target_column">
+                                    <option value="" selected>-- Выберите целевую переменную --</option>
+                                    {% for column in numeric_columns %}
+                                    <option value="{{ column }}" {% if target_column == column %}selected{% endif %}>
+                                        {{ column }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="select-arrow">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-analysis w-100">
+                                <i class="fas fa-play-circle me-2"></i>Запустить анализ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Отдельная форма для генерации финального отчета -->
+                <div class="analysis-section mt-4">
+                    <h2 class="section-title">
+                        <i class="fas fa-robot me-2"></i>Генерация финального отчёта с AI
+                    </h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="final-report-form" method="POST" action="{{ url_for('final_report') }}">
+                                <input type="hidden" name="target_column" value="{{ target_column or '' }}" id="hidden_target_column">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="use_deepseek" name="use_deepseek" checked>
+                                    <label class="form-check-label" for="use_deepseek">
+                                        <strong>Использовать AI (Deepseek) для генерации текстового отчёта</strong>
+                                    </label>
+                                </div>
+                                <button id="final-report-submit" type="submit" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                                    <span class="btn-text"><i class="fas fa-robot me-2"></i>Сгенерировать финальный отчёт</span>
+                                </button>
+                                <small class="text-muted d-block mt-2">
+                                    Отчёт будет включать AI-рекомендации по предобработке данных, выбору признаков и следующим шагам.
+                                </small>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if results %}
+                <!-- 1. Базовая статистика -->
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-table me-2"></i>Базовая статистика
+                    </h3>
+                    
+                    <ul class="nav nav-tabs" id="statsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="numeric-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#numeric" type="button" role="tab">
+                                Числовые признаки ({{ results.numeric_stats|length }})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="categorical-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#categorical" type="button" role="tab">
+                                Категориальные признаков ({{ results.categorical_stats|length }})
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="numeric" role="tabpanel">
+                            {% for column, stats in results.numeric_stats.items() %}
+                            <div class="stat-card">
+                                <h5>{{ column }}</h5>
+                                <div class="row">
+                                    <div class="col-md-3">Count: {{ "%.2f"|format(stats.count) }}</div>
+                                    <div class="col-md-3">Mean: {{ "%.2f"|format(stats.mean) }}</div>
+                                    <div class="col-md-3">Std: {{ "%.2f"|format(stats.std) }}</div>
+                                    <div class="col-md-3">Min: {{ "%.2f"|format(stats.min) }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="tab-pane fade" id="categorical" role="tabpanel">
+                            {% for column, stats in results.categorical_stats.items() %}
+                            <div class="stat-card">
+                                <h5>{{ column }}</h5>
+                                <p>Уникальных значений: {{ stats.unique_count }}</p>
+                                <p>Топ 5 значений:</p>
+                                <ul>
+                                    {% for value, count in stats.top_values.items() %}
+                                    <li>{{ value }}: {{ count }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2. Визуализации -->
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-bar me-2"></i>Визуализации
+                    </h3>
+                    
+                    <!-- Гистограммы -->
+                    {% if results.histograms %}
+                    <h4>Гистограммы числовых признаков</h4>
+                    <div id="histogramsCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for column, image in results.histograms.items() %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="data:image/png;base64,{{ image }}" class="d-block w-100" alt="{{ column }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Стрелки навигации -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#histogramsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#histogramsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        
+                        <!-- Индикаторы в виде точек -->
+                        <div class="carousel-indicators">
+                            {% for i in range(results.histograms|length) %}
+                            <button type="button" data-bs-target="#histogramsCarousel" 
+                                data-bs-slide-to="{{ i }}" 
+                                {% if i == 0 %}class="active" aria-current="true"{% endif %} 
+                                aria-label="Slide {{ i+1 }}"></button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if results.histograms and results.histograms|length > 1 %}
+                    <div class="carousel-navigation mt-3">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+                            <button class="btn btn-sm btn-outline-secondary prev-btn" data-target="histogramsCarousel">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="carousel-counter">
+                                <span class="current-slide">1</span> / {{ results.histograms|length }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-secondary next-btn" data-target="histogramsCarousel">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}        
+
+                    <!-- Столбчатые диаграммы -->
+                    {% if results.bar_plots %}
+                    <h4 class="mt-5">Столбчатые диаграммы категориальных признаков</h4>
+                    <div id="barPlotsCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for column, image in results.bar_plots.items() %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="data:image/png;base64,{{ image }}" class="d-block w-100" alt="{{ column }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#barPlotsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#barPlotsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators">
+                            {% for i in range(results.bar_plots|length) %}
+                            <button type="button" data-bs-target="#barPlotsCarousel" 
+                                data-bs-slide-to="{{ i }}" 
+                                {% if i == 0 %}class="active" aria-current="true"{% endif %} 
+                                aria-label="Slide {{ i+1 }}"></button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if results.bar_plots and results.bar_plots|length > 1 %}
+                    <div class="carousel-navigation mt-3">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+                            <button class="btn btn-sm btn-outline-secondary prev-btn" data-target="barPlotsCarousel">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="carousel-counter">
+                                <span class="current-slide">1</span> / {{ results.bar_plots|length }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-secondary next-btn" data-target="barPlotsCarousel">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Boxplots -->
+                    {% if results.boxplots %}
+                    <h4 class="mt-5">Boxplots</h4>
+                    <div id="boxplotsCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for column, image in results.boxplots.items() %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="data:image/png;base64,{{ image }}" class="d-block w-100" alt="{{ column }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#boxplotsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#boxplotsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators">
+                            {% for i in range(results.boxplots|length) %}
+                            <button type="button" data-bs-target="#boxplotsCarousel" 
+                                data-bs-slide-to="{{ i }}" 
+                                {% if i == 0 %}class="active" aria-current="true"{% endif %} 
+                                aria-label="Slide {{ i+1 }}"></button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if results.boxplots and results.boxplots|length > 1 %}
+                    <div class="carousel-navigation mt-3">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+                            <button class="btn btn-sm btn-outline-secondary prev-btn" data-target="boxplotsCarousel">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="carousel-counter">
+                                <span class="current-slide">1</span> / {{ results.boxplots|length }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-secondary next-btn" data-target="boxplotsCarousel">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                
+                <!-- 3. Выбросы -->
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Обнаружение выбросов
+                    </h3>
+                    
+                    <div class="row">
+                        {% for column, outlier_info in results.outliers.items() %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card {% if outlier_info.outlier_count > 0 %}outlier-card{% else %}normal-card{% endif %}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ column }}</h5>
+                    <p class="card-text">
+                        Выбросов: {{ outlier_info.outlier_count }}<br>
+                        Метод: {{ outlier_info.method }}<br>
+                        {% if outlier_info.lower_bound is not none %}
+                        Границы: [{{ "%.2f"|format(outlier_info.lower_bound) }}, 
+                                {{ "%.2f"|format(outlier_info.upper_bound) }}]
+                        {% endif %}
+                    </p>
+                                    {% if outlier_info.outlier_count > 0 %}
+                                    <button class="btn btn-sm btn-danger remove-outliers-btn" 
+                                            data-column="{{ column }}">
+                                        Удалить выбросы
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 4. Статистические тесты -->
+                {% if results.shapiro_wilk %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-flask me-2"></i>Статистические тесты
+                    </h3>
+                    
+                    <div class="card {% if results.shapiro_wilk.is_normal %}normal-card{% else %}outlier-card{% endif %}">
+                        <div class="card-body">
+                            <h5>Тест Шапиро-Уилка для {{ target_column }}</h5>
+                            <p>Статистика: {{ "%.4f"|format(results.shapiro_wilk.statistic) }}</p>
+                            <p>p-value: {{ "%.4f"|format(results.shapiro_wilk.p_value) }}</p>
+                            <p><strong>
+                                {% if results.shapiro_wilk.is_normal %}
+                                Распределение нормальное (p > 0.05)
+                                {% else %}
+                                Распределение не нормальное (p ≤ 0.05)
+                                {% endif %}
+                            </strong></p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 5. Корреляции -->
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-project-diagram me-2"></i>Корреляционный анализ
+                    </h3>
+                    
+                    {% if results.correlation_heatmap %}
+                    <h4>Матрица корреляций</h4>
+                    <img src="data:image/png;base64,{{ results.correlation_heatmap }}" 
+                         class="img-fluid rounded shadow" alt="Correlation Heatmap">
+                    {% else %}
+                    <p>Признаков слишком много для отображения матрицы корреляций</p>
+                    {% endif %}
+                    
+                    {% if results.multicollinear_pairs %}
+                    <h4 class="mt-4">Мультиколлинеарность</h4>
+                    <p>Обнаружено {{ results.multicollinear_pairs|length }} сильно коррелирующих пар</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Признак 1</th>
+                                    <th>Признак 2</th>
+                                    <th>Корреляция</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pair in results.multicollinear_pairs %}
+                                <tr>
+                                    <td>{{ pair.feature1 }}</td>
+                                    <td>{{ pair.feature2 }}</td>
+                                    <td>{{ "%.3f"|format(pair.correlation) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    {% if results.top_correlations and target_column %}
+                    <h4 class="mt-4">Топ 10 признаков, коррелирующих с {{ target_column }}</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Признак</th>
+                                    <th>Корреляция</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feature, correlation in results.top_correlations.items() %}
+                                <tr>
+                                    <td>{{ feature }}</td>
+                                    <td>{{ "%.3f"|format(correlation) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- 6. Расширенный статистический анализ -->
+                {% if results.categorical_relationships %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-link me-2"></i>Анализ связей между категориальными признаками
+                    </h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Признак 1</th>
+                                    <th>Признак 2</th>
+                                    <th>χ² статистика</th>
+                                    <th>p-value</th>
+                                    <th>Коэффициент Крамера</th>
+                                    <th>Значимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rel in results.categorical_relationships[:10] %}
+                                <tr>
+                                    <td>{{ rel.feature1 }}</td>
+                                    <td>{{ rel.feature2 }}</td>
+                                    <td>{{ "%.4f"|format(rel.chi2_statistic) }}</td>
+                                    <td>{{ "%.4f"|format(rel.p_value) }}</td>
+                                    <td>{{ "%.4f"|format(rel.cramers_v) }}</td>
+                                    <td>
+                                        {% if rel.is_significant %}
+                                        <span class="badge bg-success">Значимо</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Не значимо</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 7. Смешанный анализ (числовой + категориальный) -->
+                {% if results.mixed_type_analysis %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line me-2"></i>ANOVA: Смешанный анализ
+                    </h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Категориальный признак</th>
+                                    <th>Числовой признак</th>
+                                    <th>F-статистика</th>
+                                    <th>p-value</th>
+                                    <th>η² (эта-квадрат)</th>
+                                    <th>Значимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for analysis in results.mixed_type_analysis[:10] %}
+                                <tr>
+                                    <td>{{ analysis.categorical_feature }}</td>
+                                    <td>{{ analysis.numeric_feature }}</td>
+                                    <td>{{ "%.4f"|format(analysis.f_statistic) }}</td>
+                                    <td>{{ "%.4f"|format(analysis.p_value) }}</td>
+                                    <td>{{ "%.4f"|format(analysis.eta_squared) }}</td>
+                                    <td>
+                                        {% if analysis.is_significant %}
+                                        <span class="badge bg-success">Значимо</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Не значимо</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 8. Коэффициент Спирмена -->
+                {% if results.spearman_correlations %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-sort-amount-up me-2"></i>Корреляция Спирмена
+                    </h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Пары признаков</th>
+                                    <th>Коэффициент Спирмена</th>
+                                    <th>p-value</th>
+                                    <th>Значимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pair, corr in results.spearman_correlations.items() %}
+                                {% if corr.correlation|abs > 0.3 %}
+                                <tr>
+                                    <td>{{ pair }}</td>
+                                    <td>{{ "%.4f"|format(corr.correlation) }}</td>
+                                    <td>{{ "%.4f"|format(corr.p_value) }}</td>
+                                    <td>
+                                        {% if corr.is_significant %}
+                                        <span class="badge bg-success">Значимо</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Не значимо</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 9. F-статистика дисперсионного анализа -->
+                {% if results.f_statistics %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-calculator me-2"></i>F-статистика дисперсионного анализа
+                    </h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Признак</th>
+                                    <th>F-статистика</th>
+                                    <th>p-value</th>
+                                    <th>Значимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for f_stat in results.f_statistics[:10] %}
+                                <tr>
+                                    <td>{{ f_stat.feature }}</td>
+                                    <td>{{ "%.4f"|format(f_stat.f_statistic) }}</td>
+                                    <td>{{ "%.4f"|format(f_stat.p_value) }}</td>
+                                    <td>
+                                        {% if f_stat.is_significant %}
+                                        <span class="badge bg-success">Значимо</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Не значимо</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 10. VIF анализ мультиколлинеарности -->
+                {% if results.vif_analysis and results.vif_analysis.vif_scores %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>VIF анализ мультиколлинеарности
+                    </h3>
+                    
+                    {% if results.vif_analysis.high_vif_features %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Внимание!</strong> Обнаружены признаки с высоким VIF (>10): 
+                        {{ results.vif_analysis.high_vif_features|join(', ') }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Признак</th>
+                                    <th>VIF</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vif_score in results.vif_analysis.vif_scores %}
+                                <tr>
+                                    <td>{{ vif_score.Feature }}</td>
+                                    <td>{{ "%.2f"|format(vif_score.VIF) }}</td>
+                                    <td>
+                                        {% if vif_score.VIF > 10 %}
+                                        <span class="badge bg-danger">Высокий VIF</span>
+                                        {% elif vif_score.VIF > 5 %}
+                                        <span class="badge bg-warning">Средний VIF</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Низкий VIF</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 11. Множественная корреляция -->
+                {% if results.multiple_correlations %}
+                <div class="analysis-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-project-diagram me-2"></i>Множественная корреляция
+                    </h3>
+                    
+                    <div class="row">
+                        {% for feature, corr_data in results.multiple_correlations.items() %}
+                        {% if corr_data.max_correlation > 0.5 %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ feature }}</h6>
+                                    <p class="card-text">
+                                        <strong>Максимальная корреляция:</strong> {{ "%.3f"|format(corr_data.max_correlation) }}<br>
+                                        <strong>Средняя корреляция:</strong> {{ "%.3f"|format(corr_data.mean_correlation) }}<br>
+                                        {% if corr_data.highly_correlated %}
+                                        <strong>Сильно коррелирующие:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            {% for other_feature, correlation in corr_data.highly_correlated.items() %}
+                                            <li>{{ other_feature }}: {{ "%.3f"|format(correlation) }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if results %}
+    <div class="text-center mt-5 mb-5">
+        <a href="/download" class="btn-download">
+            <i class="fas fa-download me-2"></i>Скачать обработанный файл
+        </a>
+    </div>
+    {% endif %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработка удаления выбросов
+        document.querySelectorAll('.remove-outliers-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const column = this.dataset.column;
+                const card = this.closest('.card');
+                const originalText = this.innerHTML;
+                
+                if (confirm(`Удалить выбросы в столбце ${column}?`)) {
+                    // Показываем индикатор загрузки
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    
+                    fetch('/remove-outliers', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ column: column })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Обновляем только эту карточку
+                            const outlierInfo = card.querySelector('.card-text');
+                            const button = card.querySelector('.btn');
+                            
+                            outlierInfo.innerHTML = `
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle"></i> Выбросы удалены
+                                </span>
+                                <br>
+                                <small class="text-muted">Обновлено: ${new Date().toLocaleTimeString()}</small>
+                            `;
+                            
+                            button.innerHTML = '<i class="fas fa-check"></i> Готово';
+                            button.classList.remove('btn-danger');
+                            button.classList.add('btn-success');
+                            button.disabled = true;
+                            
+                        } else {
+                            alert('Ошибка: ' + data.message);
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        alert('Ошибка сети: ' + error);
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    });
+                }
+            });
+        });
+
+        // Улучшенное управление каруселями
+        const initializeCarousels = () => {
+            const carousels = document.querySelectorAll('.carousel');
+            
+            carousels.forEach(carousel => {
+                const carouselInstance = new bootstrap.Carousel(carousel, {
+                    interval: 5000,
+                    pause: 'hover',
+                    wrap: true
+                });
+                
+                // Обновление счетчика
+                carousel.addEventListener('slid.bs.carousel', function(e) {
+                    updateCarouselCounter(this.id, e.to);
+                });
+                
+                // Инициализация счетчика
+                updateCarouselCounter(carousel.id, 0);
+            });
+            
+            // Обработка кнопок навигации
+            document.querySelectorAll('.prev-btn, .next-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const target = this.dataset.target;
+                    const carousel = document.getElementById(target);
+                    const carouselInstance = bootstrap.Carousel.getInstance(carousel);
+                    
+                    if (this.classList.contains('prev-btn')) {
+                        carouselInstance.prev();
+                    } else {
+                        carouselInstance.next();
+                    }
+                    
+                    // Перезапуск авто-прокрутки
+                    carouselInstance.cycle();
+                });
+            });
+            
+            // Добавляем обработчики для клавиатуры
+            document.addEventListener('keydown', function(e) {
+                const activeCarousel = document.querySelector('.carousel:focus-within') || 
+                                    document.querySelector('.carousel:hover');
+                
+                if (activeCarousel) {
+                    const carouselInstance = bootstrap.Carousel.getInstance(activeCarousel);
+                    if (e.key === 'ArrowLeft') {
+                        carouselInstance.prev();
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight') {
+                        carouselInstance.next();
+                        e.preventDefault();
+                    }
+                }
+            });
+        };
+        
+        // Функция обновления счетчика
+        function updateCarouselCounter(carouselId, currentIndex) {
+            const counterElement = document.querySelector(`[data-target="${carouselId}"]`)
+                ?.closest('.carousel-navigation')
+                ?.querySelector('.carousel-counter .current-slide');
+                
+            if (counterElement) {
+                counterElement.textContent = currentIndex + 1;
+            }
+        }
+        
+        // Инициализация каруселей
+        initializeCarousels();
+        
+        // Обновление скрытого поля target_column при изменении выбора
+        const targetColumnSelect = document.getElementById('target_column');
+        const hiddenTargetColumn = document.getElementById('hidden_target_column');
+        if (targetColumnSelect && hiddenTargetColumn) {
+            targetColumnSelect.addEventListener('change', function() {
+                hiddenTargetColumn.value = this.value;
+            });
+            // Инициализация значения при загрузке
+            hiddenTargetColumn.value = targetColumnSelect.value;
+        }
+        
+        // Добавляем миниатюры для навигации (опционально)
+        function addThumbnailNavigation() {
+            document.querySelectorAll('.carousel').forEach(carousel => {
+                const items = carousel.querySelectorAll('.carousel-item');
+                if (items.length > 1) {
+                    const thumbnailsContainer = document.createElement('div');
+                    thumbnailsContainer.className = 'carousel-thumbnails';
+                    
+                    items.forEach((item, index) => {
+                        const img = item.querySelector('img');
+                        if (img) {
+                            const thumbnail = document.createElement('div');
+                            thumbnail.className = `carousel-thumbnail ${index === 0 ? 'active' : ''}`;
+                            thumbnail.innerHTML = `<img src="${img.src}" alt="Thumbnail ${index + 1}">`;
+                            thumbnail.addEventListener('click', () => {
+                                const carouselInstance = bootstrap.Carousel.getInstance(carousel);
+                                carouselInstance.to(index);
+                            });
+                            thumbnailsContainer.appendChild(thumbnail);
+                        }
+                    });
+                    
+                    carousel.parentNode.insertBefore(thumbnailsContainer, carousel.nextSibling);
+                    
+                    // Обновление активной миниатюры
+                    carousel.addEventListener('slid.bs.carousel', function(e) {
+                        document.querySelectorAll(`.carousel-thumbnails .carousel-thumbnail`).forEach((thumb, i) => {
+                            thumb.classList.toggle('active', i === e.to);
+                        });
+                    });
+                }
+            });
+        }
+        
+        // Раскомментируйте следующую строку, если хотите добавить миниатюры
+        // addThumbnailNavigation();
+
+        // Индикатор загрузки при генерации финального отчёта
+        const finalReportForm = document.getElementById('final-report-form');
+        const finalReportButton = document.getElementById('final-report-submit');
+        if (finalReportForm && finalReportButton) {
+            finalReportForm.addEventListener('submit', function () {
+                const spinner = finalReportButton.querySelector('.spinner-border');
+                const textSpan = finalReportButton.querySelector('.btn-text');
+                if (spinner && textSpan) {
+                    spinner.classList.remove('d-none');
+                    textSpan.textContent = 'Генерация отчёта...';
+                }
+                finalReportButton.disabled = true;
+            });
+        }
+    });
+    </script>
+
+    {% include 'login_modal.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <script src="{{ url_for('static', filename='auth.js') }}"></script>
+</body>
+</html>

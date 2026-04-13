@@ -1,0 +1,44 @@
+<div class="auth-modal" id="authModal">
+  <div class="auth-container">
+    <!-- Кнопки переключения между формами -->
+    <div class="auth-tabs">
+      <button class="tab-btn active" data-tab="login">Вход</button>
+      <button class="tab-btn" data-tab="register">Регистрация</button>
+      <button class="close-modal">&times;</button>
+    </div>
+    
+    <!-- Форма входа -->
+    <div class="auth-form active" id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Пароль" required>
+      <button id="loginBtn">Войти</button>
+      <div class="auth-links">
+        <a href="#" id="forgotPassword">Забыли пароль?</a>
+      </div>
+    </div>
+    
+    <!-- Форма регистрации -->
+    <div class="auth-form" id="registerForm">
+      <input type="text" id="registerName" placeholder="Ваше имя" required>
+      <input type="email" id="registerEmail" placeholder="Email" required>
+      <input type="password" id="registerPassword" placeholder="Пароль" required>
+      <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
+      <button id="registerBtn">Зарегистрироваться</button>
+    </div>
+    
+    <!-- Форма восстановления пароля -->
+    <div class="auth-form" id="recoveryForm">
+      <h3>Восстановление пароля</h3>
+      <p>Введите email для отправки кода подтверждения</p>
+      <input type="email" id="recoveryEmail" placeholder="Ваш email" required>
+      <button id="sendRecoveryBtn">Отправить код</button>
+      <div class="auth-links">
+        <a href="#" id="backToLogin">Вернуться к входу</a>
+      </div>
+      <div id="recoveryStatus" class="status-message"></div>
+    </div>
+    
+    <!-- Статусные сообщения -->
+    <div id="authStatus" class="status-message"></div>
+  </div>
+</div>

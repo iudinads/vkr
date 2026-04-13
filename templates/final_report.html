@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Финальный отчет по данным</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_static.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Стили для markdown-контента */
+        .markdown-content {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+        }
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3,
+        .markdown-content h4,
+        .markdown-content h5,
+        .markdown-content h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #2c3e50;
+        }
+        .markdown-content h1 {
+            font-size: 2em;
+            border-bottom: 2px solid #e1e8ed;
+            padding-bottom: 0.3em;
+        }
+        .markdown-content h2 {
+            font-size: 1.6em;
+            border-bottom: 1px solid #e1e8ed;
+            padding-bottom: 0.3em;
+        }
+        .markdown-content h3 {
+            font-size: 1.3em;
+        }
+        .markdown-content h4 {
+            font-size: 1.1em;
+        }
+        .markdown-content p {
+            margin-bottom: 1em;
+        }
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-bottom: 1em;
+            padding-left: 2em;
+        }
+        .markdown-content li {
+            margin-bottom: 0.5em;
+        }
+        .markdown-content ul li {
+            list-style-type: disc;
+        }
+        .markdown-content ol li {
+            list-style-type: decimal;
+        }
+        .markdown-content strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .markdown-content em {
+            font-style: italic;
+        }
+        .markdown-content code {
+            background-color: #f4f4f4;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        .markdown-content pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 5px;
+            padding: 1em;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        .markdown-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #333;
+        }
+        .markdown-content blockquote {
+            border-left: 4px solid #4f46e5;
+            padding-left: 1em;
+            margin-left: 0;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+        .markdown-content table th,
+        .markdown-content table td {
+            border: 1px solid #dee2e6;
+            padding: 0.75em;
+            text-align: left;
+        }
+        .markdown-content table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .markdown-content table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .markdown-content hr {
+            border: none;
+            border-top: 2px solid #e1e8ed;
+            margin: 2em 0;
+        }
+        .markdown-content a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        .markdown-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animated outline button (dynamic contour) */
+        .btn-animated-outline {
+            position: relative;
+            background: transparent;
+            border: 1px solid rgba(79, 70, 229, 0.35);
+            color: #2c3e50;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .btn-animated-outline::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: 0.55rem;
+            background: conic-gradient(
+                from 0deg,
+                #4f46e5,
+                #06b6d4,
+                #22c55e,
+                #f59e0b,
+                #ec4899,
+                #4f46e5
+            );
+            animation: spinBorder 2.6s linear infinite;
+            z-index: -1;
+        }
+        .btn-animated-outline::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: 0.5rem;
+            background: #fff;
+            z-index: -1;
+        }
+        @keyframes spinBorder {
+            to { transform: rotate(360deg); }
+        }
+        .btn-animated-outline:hover {
+            color: #111827;
+            border-color: rgba(79, 70, 229, 0.6);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.18);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg custom-navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Финальный отчет</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('statistical_analysis') }}">Вернуться к анализу</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/download">Скачать CSV</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-3">Финальный отчёт</h1>
+            {% if report.deepseek_report_html %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>AI Narrative (Deepseek)
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="markdown-content">
+                        {{ report.deepseek_report_html|safe }}
+                    </div>
+                </div>
+            </div>
+            {% elif report.deepseek_report %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>AI Narrative (Deepseek)
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="markdown-content">
+                        <pre style="white-space:pre-wrap;">{{ report.deepseek_report }}</pre>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Краткая сводка данных</h5>
+                            <p>Целевая переменная: <strong>{{ target_column or 'Не указана' }}</strong></p>
+                            {% set ar = report.analysis_results %}
+                            {% if ar %}
+                                <p>Признаков (числовых): {{ ar.numeric_stats|length }}</p>
+                                <p>Признаков (категориальных): {{ ar.categorical_stats|length }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Рекомендации (локальные)</h5>
+                            {% set recs = report.local_recommendations %}
+                            {% if recs.drop %}
+                            <h6>Удалить</h6>
+                            <ul>
+                                {% for r in recs.drop %}
+                                <li><strong>{{ r.feature }}</strong> — {{ r.reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p>Нет явных рекомендаций на удаление.</p>
+                            {% endif %}
+
+                            {% if recs.keep %}
+                            <h6 class="mt-3">Оставить</h6>
+                            <ul>
+                                {% for r in recs.keep %}
+                                <li><strong>{{ r.feature }}</strong> — {{ r.reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+
+                            {% if recs.transform %}
+                            <h6 class="mt-3">Трансформировать / заполнить</h6>
+                            <ul>
+                                {% for r in recs.transform %}
+                                <li><strong>{{ r.feature }}</strong> — {{ r.reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if report.analysis_results.correlation_heatmap %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Матрица корреляций</h5>
+                            <img src="data:image/png;base64,{{ report.analysis_results.correlation_heatmap }}" alt="correlations" class="img-fluid rounded shadow">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Быстрые действия</h5>
+                            <ol>
+                                <li>Примените предложенные удаления (dry-run) и сравните метрики модели.</li>
+                                <li>Проверьте качество заполнения пропусков в признаках из списка "Трансформировать".</li>
+                                <li>Если используете регрессию — оцените нормальность target; для классификации сбалансируйте классы.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Метаданные</h5>
+                            {% if report.analysis_results %}
+                                <p>Строк: {{ report.analysis_results.numeric_stats.values()|list|length }}</p>
+                            {% endif %}
+                            <p>AI: {{ 'включён' if report.deepseek_report else 'только локальные рекомендации' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="/download" class="btn btn-outline-secondary me-2">Скачать CSV</a>
+                <a href="{{ url_for('export_final_report_pdf') }}" class="btn btn-animated-outline me-2">
+                    <i class="fas fa-file-pdf me-1"></i>Экспорт PDF
+                </a>
+                <a href="{{ url_for('statistical_analysis') }}" class="btn btn-primary">Вернуться к анализу</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

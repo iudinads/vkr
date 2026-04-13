@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ошибка</title>
+    <link rel="stylesheet" href="/static/auth.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .error-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        .error-title {
+            color: #dc2626;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .error-text {
+            color: #475569;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        .home-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .home-btn:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-title">Ошибка</h1>
+        <p class="error-text">
+            Ссылка для сброса пароля недействительна или просрочена.<br>
+            Пожалуйста, запросите новую ссылку.
+        </p>
+        <a href="/" class="home-btn">На главную</a>
+    </div>
+</body>
+</html>

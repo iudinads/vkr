@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ данных</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_1.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_upload_page.css') }}?v=1.0">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+      integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg custom-navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Меню</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/">
+                <i class="fas fa-check-circle me-1"></i>Валидация данных
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('statistical_analysis') }}">
+                <i class="fas fa-chart-line me-1"></i>Статистический анализ
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <span class="nav-link">{{ current_user.email }}</span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Выйти</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="loginBtnNav">Войти</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5 pt-4">
+    <!-- Заголовок -->
+    <div class="page-header text-center mb-5">
+      <h1 class="page-title">
+        <i class="fas fa-database me-3"></i>Анализ данных: {{ filename }}
+      </h1>
+      <p class="page-subtitle">Детальный обзор и обработка вашего dataset</p>
+    </div>
+
+    <!-- Таблица данных -->
+    <div class="data-section mb-5">
+      <h2 class="section-title">
+        <i class="fas fa-table me-2"></i>Просмотр данных
+      </h2>
+      
+      <div class="data-table-container">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                {% for column in columns %}
+                <th>{{ column }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in data %}
+              <tr>
+                {% for value in row %}
+                <td>{{ value }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточки с информацией -->
+    <div class="info-cards-section">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle me-2"></i>Информация о данных
+      </h2>
+
+      <div class="row">
+        <!-- Общая информация -->
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-icon">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="card-content">
+              <h3>Общая информация</h3>
+              <div class="info-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Строк:</span>
+                  <span class="stat-value">{{ total_rows }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Столбцов:</span>
+                  <span class="stat-value">{{ total_columns }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Типы данных -->
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-icon">
+              <i class="fas fa-code"></i>
+            </div>
+            <div class="card-content">
+              <h3>Типы данных</h3>
+              <div class="data-types-list">
+                {% for column, dtype in data_types.items() %}
+                <div class="data-type-item">
+                  <span class="column-name">{{ column }}:</span>
+                  <span class="data-type">{{ dtype }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Пропуски -->
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-icon">
+              <i class="fas fa-search-minus"></i>
+            </div>
+            <div class="card-content">
+              <h3>Пропуски данных</h3>
+              <div class="missing-stats">
+                {% for column, count in missing_data.items() %}
+                <div class="missing-item">
+                  <span class="column-name">{{ column }}:</span>
+                  <span class="missing-count">{{ count }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="summary-stats">
+                <div class="summary-item">
+                  <span>Всего пропусков:</span>
+                  <strong>{{ amount_nulls }}</strong>
+                </div>
+                <div class="summary-item">
+                  <span>Строк с пропусками:</span>
+                  <strong>{{ amount_str }}</strong>
+                </div>
+              </div>
+              
+              <div class="action-buttons">
+                <button class="btn-action btn-remove-missing">
+                  <i class="fas fa-trash me-2"></i>Удалить пропуски
+                </button>
+                <button class="btn-action btn-fill-missing" id="btn-open-fill-options">
+                  <i class="fas fa-fill me-2"></i>Заполнить пропуски
+                </button>
+              </div>
+
+              <!-- Опции заполнения -->
+              <div id="fill-options-container" class="fill-options-container">
+                <div class="back-button" id="btn-back">
+                  <i class="fas fa-arrow-left me-2"></i>Назад
+                </div>
+                
+                <div class="options-grid">
+                  <div class="option-group">
+                    <h4>Категориальные признаки</h4>
+                    <label class="option-label">
+                      <input type="radio" name="categorical" value="unknown">
+                      <span class="option-text">Неизвестен</span>
+                    </label>
+                    <label class="option-label">
+                      <input type="radio" name="categorical" value="most_frequent">
+                      <span class="option-text">Самое частое</span>
+                    </label>
+                    <label class="option-label">
+                      <input type="radio" name="categorical" value="knn">
+                      <span class="option-text">KNN-Imputer (k=5)</span>
+                    </label>
+                  </div>
+
+                  <div class="option-group">
+                    <h4>Количественные признаки</h4>
+                    <label class="option-label">
+                      <input type="radio" name="quantitative" value="median">
+                      <span class="option-text">Медиана</span>
+                    </label>
+                    <label class="option-label">
+                      <input type="radio" name="quantitative" value="mean">
+                      <span class="option-text">Среднее</span>
+                    </label>
+                    <label class="option-label">
+                      <input type="radio" name="quantitative" value="zero">
+                      <span class="option-text">0</span>
+                    </label>
+                    <label class="option-label">
+                      <input type="radio" name="quantitative" value="knn">
+                      <span class="option-text">KNN-Imputer (k=5)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button id="btn-fill" class="btn-primary disabled" disabled>
+                  <i class="fas fa-check me-2"></i>Заполнить
+                </button>
+              </div>
+
+              <div id="result-message" class="result-message"></div>
+              <div id="spinner-missing" class="spinner-container">
+                <div class="spinner"></div>
+                <span>Обработка...</span>
+              </div>
+              <div id="result-message-missing" class="result-message"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Дубликаты -->
+        <div class="col-lg-6 mb-4">
+          <div class="info-card">
+            <div class="card-icon">
+              <i class="fas fa-copy"></i>
+            </div>
+            <div class="card-content">
+              <h3>Дубликаты</h3>
+              <div class="duplicates-info">
+                <span class="duplicates-count">Найдено: {{ total_duplicates }}</span>
+              </div>
+              
+              <div class="action-buttons">
+                <button class="btn-action btn-remove-duplicates">
+                  <i class="fas fa-trash me-2"></i>Удалить дубликаты
+                </button>
+              </div>
+
+              <div id="spinner-duplicates" class="spinner-container">
+                <div class="spinner"></div>
+                <span>Обработка...</span>
+              </div>
+              <div id="result-message-duplicates" class="result-message"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="action-section text-center py-5">
+      <div class="action-buttons-group">
+        <a href="/" class="btn-secondary">
+          <i class="fas fa-upload me-2"></i>Загрузить другой файл
+        </a>
+        <a href="/download" class="btn-primary">
+          <i class="fas fa-download me-2"></i>Скачать обработанный файл
+        </a>
+        <a href="{{ url_for('statistical_analysis') }}" class="btn-stat-analysis">
+          <i class="fas fa-chart-line me-2"></i>Статистический анализ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно авторизации -->
+  {% include 'login_modal.html' %}
+
+  <script src="{{ url_for('static', filename='upload_script.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+  <script src="{{ url_for('static', filename='auth.js') }}"></script>
+</body>
+</html>

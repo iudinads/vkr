@@ -1,0 +1,677 @@
+/* Стили для статистического анализа */
+:root {
+    --primary-pink: #FFD1DC;
+    --accent-pink: #FFB6C1;
+    --dark-pink: #FF69B4;
+    --soft-blue: #B5EAD7;
+    --light-blue: #C7CEEA;
+    --text-dark: #2F4F4F;
+    --text-light: #6c757d;
+    --background: #FFFFFF;
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --indicator-active: #2F4F4F;
+    --indicator-inactive: #dee2e6;
+}
+
+.analysis-section {
+    background: var(--background);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f0f0f0;
+}
+
+.section-title {
+    color: #000000;
+    border-bottom: 2px solid var(--primary-pink);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    font-weight: 300;
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--soft-blue) 100%);
+    color: var(--text-dark);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+    border: none;
+}
+
+.stat-card h5 {
+    margin-bottom: 16px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+}
+
+.outlier-card {
+    border-left: 4px solid #ff6b6b;
+    background: #fff5f5;
+}
+
+.normal-card {
+    border-left: 4px solid #51cf66;
+    background: #f8f9fa;
+}
+
+/* Карусель с индикаторами */
+.carousel {
+    position: relative;
+    margin: 32px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.carousel-inner {
+    border-radius: 16px;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 420px;
+    object-fit: contain;
+    background: var(--background);
+    padding: 20px;
+}
+
+/* Улучшенные индикаторы карусели - ЧЕРНЫЕ ТОЧКИ */
+.carousel-indicators {
+    position: absolute;
+    bottom: -40px;
+    margin: 0;
+    justify-content: center;
+    gap: 8px;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #cccccc; /* Серая неактивная точка */
+    border: 2px solid transparent;
+    opacity: 1;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.carousel-indicators .active {
+    background-color: #000000 !important; /* Черная активная точка */
+    transform: scale(1.2);
+    border-color: #000000;
+}
+
+.carousel-indicators [data-bs-target]:hover {
+    background-color: #666666;
+    transform: scale(1.1);
+}
+
+/* Убедимся, что карусель имеет отступ для индикаторов */
+.carousel {
+    margin-bottom: 50px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 182, 193, 0.9);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev {
+    left: 15px;
+}
+
+.carousel-control-next {
+    right: 15px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: var(--accent-pink);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232F4F4F'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+    width: 20px;
+    height: 20px;
+}
+
+.carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232F4F4F'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    width: 20px;
+    height: 20px;
+}
+
+/* Таблицы */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-pink) 100%);
+    color: var(--text-dark);
+    border: none;
+    font-weight: 400;
+    padding: 16px;
+    font-size: 0.95rem;
+}
+
+.table tbody td {
+    padding: 14px 16px;
+    border-color: #f0f0f0;
+    font-weight: 300;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 209, 220, 0.1);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 182, 193, 0.15);
+}
+
+/* Кнопка анализа */
+.btn-analysis {
+    background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-pink) 100%);
+    border: none;
+    color: var(--text-dark);
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+}
+
+.btn-analysis:hover {
+    background: linear-gradient(135deg, var(--accent-pink) 0%, var(--dark-pink) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 182, 193, 0.4);
+    color: var(--text-dark);
+}
+
+/* Кнопка скачивания */
+.btn-download {
+    display: inline-block;
+    background: linear-gradient(135deg, #B5EAD7 0%, #95D5B2 100%);
+    color: var(--text-dark);
+    padding: 16px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(181, 234, 215, 0.3);
+}
+
+.btn-download:hover {
+    background: linear-gradient(135deg, #95D5B2 0%, #74C69D 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(181, 234, 215, 0.4);
+    color: var(--text-dark);
+}
+
+/* Навигационные табы */
+.nav-tabs {
+    border-bottom: 2px solid var(--primary-pink);
+    margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-light);
+    font-weight: 300;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.nav-tabs .nav-link:hover {
+    border: none;
+    background-color: rgba(255, 209, 220, 0.2);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--text-dark);
+    background-color: var(--primary-pink);
+    border: none;
+    font-weight: 400;
+}
+
+/* Карточки */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 16px;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+/* Заголовки внутри секций */
+.analysis-section h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 350;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--primary-pink);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .analysis-section {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .carousel-item img {
+        height: 320px;
+        padding: 15px;
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .carousel-indicators [data-bs-target] {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* Стили для выбора */
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    transition: all 0.3s ease;
+    appearance: none;
+}
+
+.custom-select:focus {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 0 0.2rem rgba(255, 182, 193, 0.25);
+    background: white;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-light);
+}
+
+/* Общие стили */
+body {
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
+    background-color: #fafafa;
+    color: var(--text-dark);
+}
+
+.navbar-brand, .nav-link {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+}
+
+/* Текстовые элементы */
+p, li, .form-label {
+    font-weight: 300;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Улучшенные индикаторы для всех каруселей */
+#histogramsCarousel .carousel-indicators,
+#barPlotsCarousel .carousel-indicators,
+#boxplotsCarousel .carousel-indicators {
+    bottom: -45px;
+}
+
+/* Убедимся, что все индикаторы видны */
+.carousel-indicators {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+
+/* Стили для навигации карусели */
+.carousel-navigation {
+    margin: 20px 0;
+}
+
+.carousel-counter {
+    background: var(--primary-pink);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-dark);
+    min-width: 80px;
+    text-align: center;
+}
+
+.prev-btn, .next-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--accent-pink);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+.prev-btn:hover, .next-btn:hover {
+    background: var(--accent-pink);
+    border-color: var(--accent-pink);
+    transform: scale(1.1);
+}
+
+/* Миниатюры для навигации */
+.carousel-thumbnails {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.carousel-thumbnail {
+    width: 60px;
+    height: 45px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.carousel-thumbnail:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.carousel-thumbnail.active {
+    opacity: 1;
+    border-color: var(--dark-pink);
+    transform: scale(1.1);
+}
+
+.carousel-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Дополнительные индикаторы прогресса */
+.carousel-progress {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.carousel-progress-bar {
+    height: 100%;
+    background: var(--dark-pink);
+    width: 0%;
+    transition: width 4.9s linear;
+}
+
+/* Стили для новых статистических элементов */
+
+/* Бейджи для значимости */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 400;
+    padding: 0.35em 0.65em;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%) !important;
+    color: white;
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #868e96 0%, #6c757d 100%) !important;
+    color: white;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%) !important;
+    color: #212529;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #fa5252 100%) !important;
+    color: white;
+}
+
+/* Алерты */
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    box-shadow: var(--card-shadow);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d1edff 0%, #74c0fc 100%);
+    color: #0c5460;
+    border-left: 4px solid #20c997;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+/* Улучшенные карточки для множественной корреляции */
+.card h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.card ul {
+    font-size: 0.9rem;
+    margin-top: 8px;
+}
+
+.card ul li {
+    margin-bottom: 4px;
+    font-weight: 300;
+}
+
+/* Стили для статистических таблиц */
+.table th {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+}
+
+.table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+/* Цветовое кодирование для статистических значений */
+.stat-value-high {
+    color: #e74c3c;
+    font-weight: 400;
+}
+
+.stat-value-medium {
+    color: #f39c12;
+    font-weight: 400;
+}
+
+.stat-value-low {
+    color: #27ae60;
+    font-weight: 400;
+}
+
+/* Анимации для новых элементов */
+.analysis-section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для секций с новыми анализами */
+.analysis-section h3 i {
+    color: var(--accent-pink);
+    margin-right: 8px;
+}
+
+/* Улучшенные стили для таблиц статистических тестов */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 209, 220, 0.08);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 182, 193, 0.12);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Стили для карточек множественной корреляции */
+.multiple-correlation-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.multiple-correlation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+/* Стили для значков в заголовках секций */
+.section-title i {
+    opacity: 0.8;
+    margin-right: 10px;
+}
+
+/* Адаптивность для новых элементов */
+@media (max-width: 768px) {
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.3em 0.5em;
+    }
+    
+    .alert {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 12px;
+    }
+}
+
+/* Стили для выделения значимых результатов */
+.significant-result {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left: 3px solid #28a745;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.non-significant-result {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 3px solid #6c757d;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 8px 0;
+}

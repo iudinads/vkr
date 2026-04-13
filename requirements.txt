@@ -1,0 +1,15 @@
+flask
+flask-login
+flask-sqlalchemy
+psycopg2-binary
+flask-mail
+python-dotenv
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+scikit-learn
+statsmodels
+requests
+markdown
