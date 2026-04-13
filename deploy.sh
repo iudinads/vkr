@@ -89,8 +89,12 @@ echo "[4/9] Подготовка .env..."
 if [ ! -f .env ]; then
   SECRET_KEY="$(openssl rand -hex 32)"
   cat > .env <<EOF
+# Параметры PostgreSQL контейнера
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=vkr_db
 # VPS_ЗАМЕНИТЕ_МЕНЯ: строка подключения к вашей БД на VPS
-DATABASE_URL=postgresql://localhost:5432/db
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/vkr_db
 # Секретный ключ генерируется автоматически при первом деплое
 SECRET_KEY=${SECRET_KEY}
 # VPS_ЗАМЕНИТЕ_МЕНЯ: для продакшена обычно False

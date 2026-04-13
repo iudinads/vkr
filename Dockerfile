@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["flask", "--app", "app.py", "run", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "python wait_for_postgres.py && flask --app app.py run --host=0.0.0.0 --port=8000"]
